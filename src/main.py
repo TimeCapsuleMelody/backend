@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from route.friend_route import router as friend_route
 from route.music_route import router as music_route
-from src.route.information_route import router as information_route
+from route.information_route import router as information_route
 from route.photo_route import router as photo_route
 
 

@@ -4,15 +4,19 @@ from fastapi import APIRouter, Depends, Query, status, HTTPException, Header
 from fastapi.responses import FileResponse
 import os
 from pathlib import Path
-from pydantic import BaseModel, Field
 from fastapi.responses import StreamingResponse
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from dotenv import load_dotenv
+from config import settings
 
-load_dotenv()
+from domain.schemas.music_schemas import (
+    Music,
+    MusicByPeriod,
+    SearchMusicResponse
+)
 
-YOUTUBE_API_KEY = 'AIzaSyB0CxgntcjKXRPU_3E4FtrhqfhpnLE1IQE'
+
+YOUTUBE_API_KEY = settings.YOUTUBE_API_KEY
 
 
 async def get_youtube_service():
@@ -52,23 +56,6 @@ async def stream_music(music_id: str):
             'Accept-Ranges': 'bytes'
         }
     )
-
-
-class Music(BaseModel):
-    musicId: int
-    musicTitle: str
-    date: str
-    friend: str
-    diary: str
-    feeling: int
-    keywords: List[str]
-    image: str
-
-
-class MusicByPeriod(BaseModel):
-    year: int
-    month: int
-    music: List[Music]
 
 
 @router.get(
@@ -115,12 +102,6 @@ async def get_music_by_friend(friend: str):
 
 # 3. GET /search
 # 프론트에서 request로 검색하고자 하는 음악을 string으로 주면 유튜브에서 해당 음악을 검색한 결과 리스트를 반환합니다
-
-
-class SearchMusicResponse(BaseModel):
-    title: str
-    thumbnail: str
-    url: str
 
 
 @router.get(

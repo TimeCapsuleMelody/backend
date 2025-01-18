@@ -9,9 +9,11 @@ router = APIRouter(
     tags=["information"],
 )
 
+
 class InformationResponse(BaseModel):
     tags: List[str]
     friends: List[str]
+
 
 @router.get(
     "/@me",

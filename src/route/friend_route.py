@@ -3,20 +3,14 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
+from domain.schemas.friend_schemas import FriendWithStatisticResponse
+
 
 router = APIRouter(
     prefix="/friend",
     tags=["friend"],
 )
 
-
-class FriendWithStatisticResponse(BaseModel):
-    id: int
-    name: str
-    image: str
-    totalCount: int
-    localCount: int
-    ratio: float
 
 @router.get(
     "/with-statistic",

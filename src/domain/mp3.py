@@ -1,7 +1,8 @@
 import os
 from pytubefix import YouTube
 
-def download_audio_from_youtube(url: str, destination: str = "./downloads") -> str:
+
+def download_audio_from_youtube(url: str, destination: str = "../resource/music") -> str:
 
     # Ensure the destination directory exists
     if not os.path.exists(destination):
@@ -26,10 +27,13 @@ def download_audio_from_youtube(url: str, destination: str = "./downloads") -> s
 
     return new_file
 
+
 # Example usage
 if __name__ == "__main__":
     # Replace these variables with your desired values
-    youtube_url = "https://www.youtube.com/watch?v=VWqxvBQKwKQ"  # Replace with your YouTube video URL
-    save_path = r"C:\Users\82107\OneDrive\바탕 화면\해커톤"  # Replace with your desired save path
+    # Replace with your YouTube video URL
+    youtube_url = "https://www.youtube.com/watch?v=VWqxvBQKwKQ"
+    # Replace with your desired save path
+    save_path = r"C:\Users\82107\OneDrive\바탕 화면\해커톤"
 
     download_audio_from_youtube(youtube_url, save_path)

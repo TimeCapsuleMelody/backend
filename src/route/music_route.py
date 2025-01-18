@@ -1,20 +1,17 @@
-from typing import List, Optional
-
-from fastapi import APIRouter, Depends, Query, status, HTTPException, Header
-from fastapi.responses import FileResponse
 import os
 from pathlib import Path
-from fastapi.responses import StreamingResponse
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi.responses import FileResponse, StreamingResponse
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
 from config import settings
-
-from domain.schemas.music_schemas import (
-    Music,
-    MusicByPeriod,
-    SearchMusicResponse
-)
-
+from domain.schemas.music_schemas import (Music, MusicByPeriod,
+                                          SearchMusicResponse)
+from mock.music_mock import (MOCK_MUSIC_BY_FRIEND, MOCK_MUSIC_BY_KEYWORD,
+                             MOCK_MUSIC_BY_PERIOD)
 
 YOUTUBE_API_KEY = settings.YOUTUBE_API_KEY
 
@@ -64,19 +61,7 @@ async def stream_music(music_id: str):
     description="음악을 년-월 별로 묶어서 반환합니다."
 )
 async def get_music_by_period():
-    # mock 5개
-    return [
-        MusicByPeriod(year=2024, month=1, music=[Music(musicId=1, musicTitle="our dream", date="2024-01-01",
-                      friend="friend1", diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")]),
-        MusicByPeriod(year=2024, month=2, music=[Music(musicId=2, musicTitle="our dream", date="2024-02-01", friend="friend2", diary="diary2", feeling=2, keywords=["keyword1", "keyword2"], image="image2"),
-                                                 Music(musicId=3, musicTitle="our dream", date="2024-02-01", friend="friend3", diary="diary3", feeling=3, keywords=["keyword1", "keyword2"], image="image3")]),
-        MusicByPeriod(year=2024, month=3, music=[Music(musicId=3, musicTitle="our dream", date="2024-03-01",
-                      friend="friend3", diary="diary3", feeling=3, keywords=["keyword1", "keyword2"], image="image3")]),
-        MusicByPeriod(year=2024, month=4, music=[Music(musicId=4, musicTitle="our dream", date="2024-04-01",
-                      friend="friend4", diary="diary4", feeling=4, keywords=["keyword1", "keyword2"], image="image4")]),
-        MusicByPeriod(year=2024, month=5, music=[Music(musicId=5, musicTitle="our dream", date="2024-05-01",
-                      friend="friend5", diary="diary5", feeling=5, keywords=["keyword1", "keyword2"], image="image5")]),
-    ]
+    return MOCK_MUSIC_BY_PERIOD
 
 
 @router.get(
@@ -84,10 +69,7 @@ async def get_music_by_period():
     description="키워드에 맞는 음악을 반환합니다."
 )
 async def get_music_by_keyword(keyword: str):
-    return [
-        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1",
-              diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
-    ]
+    return MOCK_MUSIC_BY_KEYWORD
 
 
 @router.get(
@@ -95,10 +77,7 @@ async def get_music_by_keyword(keyword: str):
     description="친구에 맞는 음악을 반환합니다."
 )
 async def get_music_by_friend(friend: str):
-    return [
-        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1",
-              diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
-    ]
+    return MOCK_MUSIC_BY_FRIEND
 
 # 3. GET /search
 # 프론트에서 request로 검색하고자 하는 음악을 string으로 주면 유튜브에서 해당 음악을 검색한 결과 리스트를 반환합니다

@@ -1,15 +1,15 @@
+import os
+from datetime import datetime
 from typing import Union
-from pydantic import BaseModel
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from route.friend_route import router as friend_route
-from route.music_route import router as music_route
 from route.information_route import router as information_route
+from route.music_route import router as music_route
 from route.photo_route import router as photo_route
-import os
-from datetime import datetime
 
 app = FastAPI(
     title="Time Capsule Melody",

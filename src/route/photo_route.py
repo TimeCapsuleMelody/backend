@@ -1,10 +1,10 @@
-from typing import List
 from datetime import datetime
-from fastapi import APIRouter, Depends, Query, status, HTTPException
-from pydantic import BaseModel, Field
+from typing import List
 
-from botocore.config import Config
 import boto3
+from botocore.config import Config
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 
 from config import settings
 

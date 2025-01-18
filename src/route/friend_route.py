@@ -9,6 +9,7 @@ router = APIRouter(
     tags=["friend"],
 )
 
+
 class FriendWithStatisticResponse(BaseModel):
     id: int
     name: str
@@ -18,7 +19,7 @@ class FriendWithStatisticResponse(BaseModel):
     ratio: float
 
 
-@router.get("/friend/with-statistic", response_model=List[FriendWithStatisticResponse])
+@router.get("/with-statistic", response_model=List[FriendWithStatisticResponse])
 def get_friends_with_statistic():
     # 예시 데이터
     friends_data = [

@@ -5,6 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from route.friend_route import router as friend_route
+from route.music_route import router as music_route
+from route.keyword_route import router as keyword_route
+from route.photo_route import router as photo_route
 
 
 app = FastAPI(
@@ -37,14 +40,10 @@ app.add_middleware(
 )
 
 app.include_router(friend_route)
+app.include_router(music_route)
+app.include_router(keyword_route)
+app.include_router(photo_route)
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-

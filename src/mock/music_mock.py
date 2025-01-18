@@ -6,15 +6,15 @@ MOCK_MUSIC = [
     MusicByPeriod(year=2024, month=1, music=[
         Music(musicId=1, musicTitle="our dream", date="2024-01-01",
               friends=["friend1"], diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image=MOCK_IMAGE_URL),
-        Music(musicId=10, musicTitle="our dream", date="2024-01-01",
+        Music(musicId=10, musicTitle="happy birthday", date="2024-01-01",
               friends=["friend1"], diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image=MOCK_IMAGE_URL),
-        Music(musicId=11, musicTitle="our dream", date="2024-01-01",
+        Music(musicId=11, musicTitle="a happy day", date="2024-01-01",
               friends=["friend1"], diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image=MOCK_IMAGE_URL),
-        Music(musicId=12, musicTitle="our dream", date="2024-01-01",
+        Music(musicId=12, musicTitle="butterfly", date="2024-01-01",
               friends=["friend1"], diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image=MOCK_IMAGE_URL),
-        Music(musicId=13, musicTitle="our dream", date="2024-01-01",
+        Music(musicId=13, musicTitle="your song", date="2024-01-01",
               friends=["friend1"], diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image=MOCK_IMAGE_URL),
-        Music(musicId=15, musicTitle="our dream", date="2024-01-01",
+        Music(musicId=15, musicTitle="duck fly", date="2024-01-01",
               friends=["friend1"], diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image=MOCK_IMAGE_URL)
     ]),
     MusicByPeriod(year=2024, month=2, music=[

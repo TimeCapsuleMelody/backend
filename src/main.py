@@ -10,6 +10,7 @@ from route.friend_route import router as friend_route
 from route.information_route import router as information_route
 from route.music_route import router as music_route
 from route.photo_route import router as photo_route
+from route.memory_route import router as memory_route
 
 app = FastAPI(
     title="Time Capsule Melody",
@@ -46,6 +47,7 @@ app.include_router(friend_route)
 app.include_router(music_route)
 app.include_router(information_route)
 app.include_router(photo_route)
+app.include_router(memory_route)
 
 
 @app.get("/")

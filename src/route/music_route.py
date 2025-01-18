@@ -10,8 +10,7 @@ from googleapiclient.errors import HttpError
 from config import settings
 from domain.schemas.music_schemas import (Music, MusicByPeriod,
                                           SearchMusicResponse)
-from mock.music_mock import (MOCK_MUSIC_BY_FRIEND, MOCK_MUSIC_BY_KEYWORD,
-                             MOCK_MUSIC_BY_PERIOD)
+from mock.music_mock import MOCK_MUSIC
 from dependencies import get_db
 
 YOUTUBE_API_KEY = settings.YOUTUBE_API_KEY
@@ -62,7 +61,7 @@ async def stream_music(music_id: str):
     description="음악을 년-월 별로 묶어서 반환합니다."
 )
 async def get_music_by_period():
-    return MOCK_MUSIC_BY_PERIOD
+    return MOCK_MUSIC
 
 
 @router.get(
@@ -70,7 +69,7 @@ async def get_music_by_period():
     description="키워드에 맞는 음악을 반환합니다."
 )
 async def get_music_by_keyword(keyword: str):
-    return MOCK_MUSIC_BY_KEYWORD
+    return MOCK_MUSIC
 
 
 @router.get(
@@ -78,10 +77,14 @@ async def get_music_by_keyword(keyword: str):
     description="친구에 맞는 음악을 반환합니다."
 )
 async def get_music_by_friend(friend: str):
-    return MOCK_MUSIC_BY_FRIEND
 
-# 3. GET /search
-# 프론트에서 request로 검색하고자 하는 음악을 string으로 주면 유튜브에서 해당 음악을 검색한 결과 리스트를 반환합니다
+    # matching_music = [
+    #     music for music in MOCK_MUSIC_BY_FRIEND
+    #     if friend in music.friends
+    # ]
+    # return matching_music
+
+    return MOCK_MUSIC
 
 
 @router.get(

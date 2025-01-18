@@ -7,7 +7,7 @@ class Music(BaseModel):
     musicId: int
     musicTitle: str
     date: str
-    friend: str
+    friends: List[str]
     diary: str
     feeling: int
     keywords: List[str]

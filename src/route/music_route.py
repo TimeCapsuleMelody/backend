@@ -12,6 +12,7 @@ from domain.schemas.music_schemas import (Music, MusicByPeriod,
                                           SearchMusicResponse)
 from mock.music_mock import (MOCK_MUSIC_BY_FRIEND, MOCK_MUSIC_BY_KEYWORD,
                              MOCK_MUSIC_BY_PERIOD)
+from dependencies import get_db
 
 YOUTUBE_API_KEY = settings.YOUTUBE_API_KEY
 

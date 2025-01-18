@@ -5,6 +5,7 @@ import boto3
 from botocore.config import Config
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
+from dependencies import get_db
 
 from config import settings
 

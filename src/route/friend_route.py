@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
+from dependencies import get_db
 from domain.schemas.friend_schemas import FriendWithStatisticResponse
 
 router = APIRouter(

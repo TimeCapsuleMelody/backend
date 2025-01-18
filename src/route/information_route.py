@@ -3,6 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
+from dependencies import get_db
+
 router = APIRouter(
     prefix="/information",
     tags=["information"],

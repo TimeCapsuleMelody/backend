@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException, Header
 from fastapi.responses import FileResponse
@@ -6,42 +6,22 @@ import os
 from pathlib import Path
 from pydantic import BaseModel, Field
 from fastapi.responses import StreamingResponse
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from dotenv import load_dotenv
+
+load_dotenv()
+
+YOUTUBE_API_KEY = 'AIzaSyB0CxgntcjKXRPU_3E4FtrhqfhpnLE1IQE'
+
+
+async def get_youtube_service():
+    return build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 router = APIRouter(
     prefix="/music",
     tags=["music"],
 )
-
-
-@router.get(
-    "/by-id/{music_id}",
-    description="음악 파일을 조회합니다."
-)
-async def stream_music(music_id: str):
-    # 리소스 폴더 경로 설정
-    resource_path = Path("resource")
-
-    # 음악 파일 찾기 (예: music_id.mp3 형식으로 저장되었다고 가정)
-    # music_name = music_id + ".mp3"
-
-    music_name = "our dream.mp3"
-
-    # 음악 파일 찾기 (예: music_id.mp3 형식으로 저장되었다고 가정)
-    music_file = resource_path / music_name
-
-    # 파일이 존재하는지 확인
-    if not music_file.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Music file not found"
-        )
-
-    # 파일 응답
-    return FileResponse(
-        path=music_file,
-        media_type="audio/mpeg",
-        filename=music_file.name
-    )
 
 
 @router.get(
@@ -109,16 +89,6 @@ class Music(BaseModel):
     image: str
 
 
-# 2. GET /by-period
-"""
-response
-{
-music을 날짜에 맞게 묶어서 반환
-년-월 별로 묶어서 반환
-}
-"""
-
-
 class MusicByPeriod(BaseModel):
     year: int
     month: int
@@ -145,24 +115,66 @@ async def get_music_by_period():
                       friend="friend5", diary="diary5", feeling=5, keywords=["keyword1", "keyword2"], image="image5")]),
     ]
 
-# 3. GET /by-keyword/{keyword}
+
 @router.get(
     "/by-keyword/{keyword}",
     description="키워드에 맞는 음악을 반환합니다."
 )
 async def get_music_by_keyword(keyword: str):
     return [
-        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1", diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
+        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1",
+              diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
     ]
 
-# 3. GET /by-friend/{friend}
+
 @router.get(
     "/by-friend/{friend}",
     description="친구에 맞는 음악을 반환합니다."
 )
 async def get_music_by_friend(friend: str):
     return [
-        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1", diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
+        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1",
+              diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
     ]
 
 # 3. GET /search
+# 프론트에서 request로 검색하고자 하는 음악을 string으로 주면 유튜브에서 해당 음악을 검색한 결과 리스트를 반환합니다
+
+
+class SearchMusicResponse(BaseModel):
+    title: str
+    thumbnail: str
+    url: str
+
+
+@router.get(
+    "/search",
+    response_model=List[SearchMusicResponse],
+    description="유튜브에서 검색한 음악을 반환합니다."
+)
+async def search_music(query: str, max_results: Optional[int] = 3):
+    youtube = await get_youtube_service()
+
+    # YouTube API 검색 요청
+    search_response = youtube.search().list(
+        q=query,
+        part='snippet',
+        maxResults=max_results,
+        type='video',
+        videoCategoryId='10'  # Music category
+    ).execute()
+
+    # 검색 결과 변환
+    results = []
+    for item in search_response.get('items', []):
+        video_id = item['id']['videoId']
+        snippet = item['snippet']
+
+        result = SearchMusicResponse(
+            title=snippet['title'],
+            thumbnail=snippet['thumbnails']['high']['url'],
+            url=f"https://www.youtube.com/watch?v={video_id}"
+        )
+        results.append(result)
+
+    return results

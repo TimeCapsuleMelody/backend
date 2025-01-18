@@ -9,18 +9,6 @@ router = APIRouter(
     tags=["information"],
 )
 
-"""
-# GET /information/@me
-
-## request
-
-## response
-
-- tags: List<String>
-- friends: List<String
-
-"""
-
 class InformationResponse(BaseModel):
     tags: List[str]
     friends: List[str]

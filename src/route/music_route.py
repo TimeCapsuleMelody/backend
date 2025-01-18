@@ -33,6 +33,9 @@ async def stream_music(
 ):
     resource_path = Path("resource")
     music_name = "our dream.mp3"
+    if (music_id == 15):
+        music_name = "duck fly.mp3"
+
     music_file = resource_path / music_name
 
     if not music_file.exists():

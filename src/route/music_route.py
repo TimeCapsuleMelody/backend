@@ -24,57 +24,33 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "/streaming/{music_id}",
-    description="음악 파일을 스트리밍합니다."
-)
-async def stream_music(music_id: str, range: str = Header(None)):
+@router.get("/streaming/{music_id}")
+async def stream_music(music_id: str):
     resource_path = Path("resource")
     music_name = "our dream.mp3"
     music_file = resource_path / music_name
 
     if not music_file.exists():
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Music file not found"
+        )
 
-    file_size = music_file.stat().st_size
-
-    # Range 헤더 처리
-    start = 0
-    end = file_size - 1
-
-    if range is not None:
-        start, end = range.replace("bytes=", "").split("-")
-        start = int(start)
-        end = int(end) if end else file_size - 1
-
-    # 실제 전송할 크기
-    chunk_size = end - start + 1
-
-    # 파일 스트리밍
-    async def ranged_file_sender():
-        with open(music_file, mode="rb") as file:
-            file.seek(start)
-            remaining = chunk_size
-            while remaining > 0:
-                chunk_size = min(1024 * 1024, remaining)  # 최대 1MB씩 전송
-                chunk = file.read(chunk_size)
-                if not chunk:
-                    break
-                remaining -= len(chunk)
+    # 파일을 chunk 단위로 읽어서 전송하는 함수
+    def iterfile():
+        CHUNK_SIZE = 1024 * 1024  # 1MB 단위로 전송
+        with open(music_file, mode="rb") as file_like:
+            while chunk := file_like.read(CHUNK_SIZE):
                 yield chunk
 
-    headers = {
-        'Content-Range': f'bytes {start}-{end}/{file_size}',
-        'Accept-Ranges': 'bytes',
-        'Content-Length': str(chunk_size),
-        'Content-Disposition': f'attachment; filename="{music_name}"'
-    }
-
+    # 스트리밍 응답 생성
     return StreamingResponse(
-        ranged_file_sender(),
-        status_code=206 if range else 200,
-        media_type='audio/mpeg',
-        headers=headers
+        iterfile(),
+        media_type="audio/mpeg",
+        headers={
+            'Content-Disposition': f'attachment; filename="{music_name}"',
+            'Accept-Ranges': 'bytes'
+        }
     )
 
 

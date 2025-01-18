@@ -3,7 +3,20 @@ from pydantic import BaseModel
 
 from fastapi import FastAPI
 
-app = FastAPI()
+app = FastAPI(
+    title="Time Capsule Melody",
+    version="0.0.1",
+    description="Time Capsule Melody API",
+    contact={
+        "name": "권민재",
+        "url": "https://mindorizip.tistory.com/",
+        "email": "mjkweon17@korea.ac.kr",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://github.com/Time-Capsule-Melody/time-capsule-melody/blob/main/LICENSE",
+    },
+)
 
 # CORS
 origins = [

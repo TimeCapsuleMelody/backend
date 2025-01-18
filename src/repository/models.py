@@ -1,4 +1,4 @@
-from sqlalchemy import TIMESTAMP, Boolean, Column, Date, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import TIMESTAMP, Boolean, Column, Date, DateTime, Integer, String, Text, ForeignKey
 from sqlalchemy.dialects.mysql import TINYINT
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
@@ -7,218 +7,127 @@ Base = declarative_base()
 
 
 class Memory(Base):
+    __tablename__ = "memory"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    msuicTitle = Column(String(255), nullable=False)
-
-    created_at = Column(Date, nullable=False)
-
-    friend = Column(String(255), nullable=False)
-    diary = Column(String(255), nullable=False)
+    music_title = Column(String(1000), nullable=False)
+    music_link = Column(String(255), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(),
+                        onupdate=func.now(), nullable=False)
+    friend = Column(String(50), nullable=False)
+    diary = Column(Text, nullable=False)
     feeling = Column(Integer, nullable=False)
-    keywords = Column(String(255), nullable=False)
     image = Column(String(255), nullable=False)
+    photo_id = Column(Integer, nullable=False)
+
+    # Relationships with foreign() for explicit foreign key relationships
+    photo = relationship(
+        "Photo",
+        primaryjoin="foreign(Memory.photo_id) == Photo.id",
+        viewonly=True
+    )
+    friends = relationship(
+        "Friend",
+        secondary="memory_friend_mapping",
+        primaryjoin="Memory.id == MemoryFriendMapping.memory_id",
+        secondaryjoin="foreign(MemoryFriendMapping.friend_id) == Friend.id",
+        viewonly=True
+    )
+    keywords = relationship(
+        "Keyword",
+        secondary="memory_keyword_mapping",
+        primaryjoin="Memory.id == MemoryKeywordMapping.memory_id",
+        secondaryjoin="foreign(MemoryKeywordMapping.keyword_id) == Keyword.id",
+        viewonly=True
+    )
 
 
-class User(Base):
-    __tablename__ = "user"
-
+class Friend(Base):
+    __tablename__ = "friend"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    auth_id = Column(String(255), nullable=False)
-    auth_type = Column(String(20), nullable=False, default="FIREBASE")
-    email = Column(String(100), nullable=False)
-    user_name = Column(String(45), nullable=False)
-    github_id = Column(String(100), nullable=True)
-    instagram_id = Column(String(100), nullable=True)
-    is_active = Column(String(20), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-    is_deleted = Column(Boolean, nullable=False, default=False)
-    password = Column(Text, nullable=False)
-    # Relationships
-    admin = relationship("Admin", back_populates="user")
-    requested_books = relationship("RequestedBook", back_populates="user")
-    loans = relationship("Loan", back_populates="user")
-    book_reviews = relationship("BookReview", back_populates="user")
-    food_orders = relationship("FoodOrder", back_populates="user")
-
-
-class Admin(Base):
-    __tablename__ = "admin"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    admin_status = Column(Boolean, nullable=False)
-    expiration_date = Column(Date, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-    is_deleted = Column(Boolean, nullable=False, default=False)
-
-    # Relationship
-    user = relationship("User", back_populates="admin")
-
-
-class RequestedBook(Base):
-    __tablename__ = "requested_book"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    book_title = Column(String(255), nullable=False)
-    publication_year = Column(Integer)
-    reject_reason = Column(String(20))
-    request_link = Column(String(255), nullable=False)
-    reason = Column(Text, nullable=False)
-    request_date = Column(Date, nullable=False)
-    processing_status = Column(Integer, nullable=False, default=0)
-    processed_date = Column(Date)
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-
-    is_deleted = Column(Boolean, nullable=False, default=False)
-
-    # Relationship
-    user = relationship("User", back_populates="requested_books")
-
-
-class Loan(Base):
-    __tablename__ = "loan"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    book_id = Column(Integer, ForeignKey("book.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    loan_date = Column(Date, nullable=False)
-    due_date = Column(Date, nullable=False)
-    extend_status = Column(Boolean, nullable=False, default=False)
-    return_status = Column(Boolean, nullable=False, default=False)
-    return_date = Column(Date)
-    overdue_days = Column(Integer, nullable=False, default=0)
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-    is_deleted = Column(Boolean, nullable=False, default=False)
+    name = Column(String(50), nullable=False)
+    photo = Column(String(255), nullable=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(),
+                        onupdate=func.now(), nullable=False)
 
     # Relationships
-    user = relationship("User", back_populates="loans")
-    book = relationship("Book", back_populates="loans")
+    memories = relationship(
+        "Memory",
+        secondary="memory_friend_mapping",
+        primaryjoin="Friend.id == MemoryFriendMapping.friend_id",
+        secondaryjoin="foreign(MemoryFriendMapping.memory_id) == Memory.id",
+        viewonly=True
+    )
 
 
-class BookReview(Base):
-    __tablename__ = "book_review"
-
+class MemoryFriendMapping(Base):
+    __tablename__ = "memory_friend_mapping"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    book_id = Column(Integer, ForeignKey("book.id"), nullable=False)
-    review_content = Column(String, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-    is_deleted = Column(Boolean, nullable=False, default=False)
-    # Relationships
-    user = relationship("User", back_populates="book_reviews")
-    book = relationship("Book", back_populates="book_reviews")
-
-
-class Book(Base):
-    __tablename__ = "book"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    book_title = Column(String(255), nullable=False)
-    code = Column(String(20), nullable=False)
-    category_name = Column(String(50), nullable=False)
-    subtitle = Column(String(255))
-    author = Column(String(100), nullable=False)
-    publisher = Column(String(45), nullable=False)
-    publication_year = Column(Integer, nullable=False)
-    image_url = Column(String(255))
-    version = Column(String(45))
-    major = Column(Boolean, default=False)
-    language = Column(String(20), nullable=False, default="KOREAN")
-    book_status = Column(Boolean, nullable=False, default=True)
-    donor_name = Column(String(20))
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-    is_deleted = Column(Boolean, nullable=False, default=False)
+    memory_id = Column(Integer, nullable=False)
+    friend_id = Column(Integer, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
     # Relationships
-    book_reviews = relationship("BookReview", back_populates="book")
-    loans = relationship("Loan", back_populates="book",
-                         order_by="Loan.updated_at.desc()")  # order_by 적용
+    memory = relationship(
+        "Memory",
+        primaryjoin="foreign(MemoryFriendMapping.memory_id) == Memory.id",
+        viewonly=True
+    )
+    friend = relationship(
+        "Friend",
+        primaryjoin="foreign(MemoryFriendMapping.friend_id) == Friend.id",
+        viewonly=True
+    )
 
 
-class Notice(Base):
-    __tablename__ = "notice"
-
+class Keyword(Base):
+    __tablename__ = "keyword"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    admin_id = Column(Integer, ForeignKey("admin.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    title = Column(String(255), nullable=False)
-    content = Column(Text, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False,
-                        default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, default=func.current_timestamp(
-    ), onupdate=func.current_timestamp())
-    is_deleted = Column(Boolean, nullable=False, default=False)
+    keyword = Column(String(100), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
     # Relationships
-    admin = relationship("Admin", foreign_keys=[admin_id])
-    user = relationship("User", foreign_keys=[user_id])
+    memories = relationship(
+        "Memory",
+        secondary="memory_keyword_mapping",
+        primaryjoin="Keyword.id == MemoryKeywordMapping.keyword_id",
+        secondaryjoin="foreign(MemoryKeywordMapping.memory_id) == Memory.id",
+        viewonly=True
+    )
 
 
-class Settings(Base):
-    __tablename__ = "settings"
-
-    id = Column(Integer, primary_key=True, index=True)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
-    extend_days = Column(TINYINT(unsigned=True), nullable=False)
-    extend_max_count = Column(TINYINT(unsigned=True), nullable=False)
-    loan_days = Column(TINYINT(unsigned=True), nullable=False)
-    loan_max_book = Column(TINYINT(unsigned=True), nullable=False)
-    request_max_count = Column(TINYINT(unsigned=True), nullable=False)
-    request_max_price = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
-    updated_at = Column(TIMESTAMP, nullable=False,
-                        server_default=func.now(), onupdate=func.now())
-    is_deleted = Column(Boolean, nullable=False, default=False)
-
-
-# 여기서부터는 예시로 작성한 코드입니다.
-
-
-class Food(Base):
-    __tablename__ = "food"
-
-    id = Column(Integer, primary_key=True, index=True)
-    food_name = Column(String(255), nullable=False)
-    food_type = Column(String(20), nullable=False)
-    food_price = Column(Integer, nullable=False)
-    food_description = Column(Text, nullable=False)
-    food_image_url = Column(String(255))
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    updated_at = Column(DateTime, nullable=False,
-                        server_default=func.now(), onupdate=func.now())
-
-    orders = relationship("FoodOrder", back_populates="food")
-
-
-class FoodOrder(Base):
-    __tablename__ = "food_order"
-
+class MemoryKeywordMapping(Base):
+    __tablename__ = "memory_keyword_mapping"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    food_id = Column(Integer, ForeignKey("food.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    quantity = Column(Integer, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
-    is_deleted = Column(Boolean, nullable=False, default=False)
+    memory_id = Column(Integer, nullable=False)
+    keyword_id = Column(Integer, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    user = relationship("User", back_populates="food_orders")
-    food = relationship("Food", back_populates="orders")
+    # Relationships
+    memory = relationship(
+        "Memory",
+        primaryjoin="foreign(MemoryKeywordMapping.memory_id) == Memory.id",
+        viewonly=True
+    )
+    keyword = relationship(
+        "Keyword",
+        primaryjoin="foreign(MemoryKeywordMapping.keyword_id) == Keyword.id",
+        viewonly=True
+    )
+
+
+class Photo(Base):
+    __tablename__ = "photo"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    photo_url = Column(String(255), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(),
+                        onupdate=func.now(), nullable=False)
+
+    # Relationships
+    memories = relationship(
+        "Memory",
+        primaryjoin="foreign(Photo.id) == Memory.photo_id",
+        viewonly=True
+    )

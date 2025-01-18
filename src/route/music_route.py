@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import List, Optional
 
+from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from fastapi.responses import FileResponse, StreamingResponse
 from googleapiclient.discovery import build
@@ -26,7 +27,10 @@ router = APIRouter(
 
 
 @router.get("/streaming/{music_id}")
-async def stream_music(music_id: str):
+async def stream_music(
+    music_id: str,
+    db: Session = Depends(get_db),
+):
     resource_path = Path("resource")
     music_name = "our dream.mp3"
     music_file = resource_path / music_name
@@ -58,25 +62,36 @@ async def stream_music(music_id: str):
 @router.get(
     "/by-period",
     response_model=List[MusicByPeriod],
-    description="음악을 년-월 별로 묶어서 반환합니다."
+    description="음악을 년-월 별로 묶어서 반환합니다.",
+    deprecated=True,
 )
-async def get_music_by_period():
+async def get_music_by_period(
+        db: Session = Depends(get_db)
+):
     return MOCK_MUSIC
 
 
 @router.get(
     "/by-keyword/{keyword}",
-    description="키워드에 맞는 음악을 반환합니다."
+    description="키워드에 맞는 음악을 반환합니다.",
+    deprecated=True,
 )
-async def get_music_by_keyword(keyword: str):
+async def get_music_by_keyword(
+    keyword: str,
+    db: Session = Depends(get_db)
+):
     return MOCK_MUSIC
 
 
 @router.get(
     "/by-friend/{friend}",
-    description="친구에 맞는 음악을 반환합니다."
+    description="친구에 맞는 음악을 반환합니다.",
+    deprecated=True,
 )
-async def get_music_by_friend(friend: str):
+async def get_music_by_friend(
+    friend: str,
+    db: Session = Depends(get_db)
+):
 
     # matching_music = [
     #     music for music in MOCK_MUSIC_BY_FRIEND

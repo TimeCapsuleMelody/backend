@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class Music(BaseModel):
@@ -13,14 +13,20 @@ class Music(BaseModel):
     keywords: List[str]
     image: str
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class MusicByPeriod(BaseModel):
     year: int
     month: int
     music: List[Music]
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class SearchMusicResponse(BaseModel):
     title: str
     thumbnail: str
     url: str
+
+    model_config = ConfigDict(from_attributes=True)

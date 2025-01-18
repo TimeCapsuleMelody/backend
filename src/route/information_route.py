@@ -1,28 +1,31 @@
 from typing import List
 
+from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
-from dependencies import get_db
+from repository.models import Keyword, Friend
 
+from dependencies import get_db
+from domain.schemas.information_schemas import InformationResponse
 router = APIRouter(
     prefix="/information",
     tags=["information"],
 )
 
 
-class InformationResponse(BaseModel):
-    tags: List[str]
-    friends: List[str]
-
-
 @router.get(
     "/@me",
     description="내 정보를 조회합니다."
 )
-def get_my_information():
-    # 예시 데이터
+def get_my_information(
+    db: Session = Depends(get_db),
+):
+    # TODO: 데이터 조회
+    tags = db.query(Keyword).all()
+    friends = db.query(Friend).all()
+
     return InformationResponse(
-        tags=["희망", "우울", "행복", "슬픔", "화남", "화가남", "화가남", "화가남", "화가남", "화가남"],
-        friends=["권민재", "이재은", "이수형", "오유림"]
+        tags=tags,
+        friends=friends
     )

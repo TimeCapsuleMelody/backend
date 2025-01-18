@@ -5,6 +5,20 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+# CORS
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["Access-Control-Allow-Origin", "Authorization"]
+)
+
 
 @app.get("/")
 def read_root():
@@ -23,6 +37,7 @@ class FriendsWithStatisticResponse(BaseModel):
     totalCount: int
     localCount: int
     ratio: float
+
 
 @app.get("/friends/with-statistic", response_model=List[FriendsWithStatisticResponse])
 def get_friends_with_statistic():
@@ -45,7 +60,8 @@ def get_friends_with_statistic():
             "ratio": 0.9
         }
     ]
-    
+
     # ratio를 기준으로 내림차순 정렬
-    sorted_friends = sorted(friends_data, key=lambda x: x["ratio"], reverse=True)
+    sorted_friends = sorted(
+        friends_data, key=lambda x: x["ratio"], reverse=True)
     return sorted_friends

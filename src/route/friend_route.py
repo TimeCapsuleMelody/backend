@@ -19,7 +19,20 @@ class FriendWithStatisticResponse(BaseModel):
     ratio: float
 
 
-@router.get("/with-statistic", response_model=List[FriendWithStatisticResponse])
+@router.get(
+    "/",
+    description="친구 목록을 조회합니다."
+)
+def get_friends():
+    # TODO: need implementation
+    return {"message": "Hello, World!"}
+
+
+@router.get(
+    "/with-statistic",
+    response_model=List[FriendWithStatisticResponse],
+    description="친구 목록을 통계 정보와 함께 조회합니다."
+)
 def get_friends_with_statistic():
     # 예시 데이터
     friends_data = [

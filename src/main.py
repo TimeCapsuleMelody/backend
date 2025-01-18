@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from route.friend_route import router as friend_route
 from route.music_route import router as music_route
-from route.keyword_route import router as keyword_route
+from src.route.information_route import router as information_route
 from route.photo_route import router as photo_route
 
 
@@ -41,7 +41,7 @@ app.add_middleware(
 
 app.include_router(friend_route)
 app.include_router(music_route)
-app.include_router(keyword_route)
+app.include_router(information_route)
 app.include_router(photo_route)
 
 @app.get("/")

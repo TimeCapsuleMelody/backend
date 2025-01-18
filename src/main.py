@@ -61,32 +61,34 @@ app.include_router(music_route)
 app.include_router(information_route)
 app.include_router(photo_route)
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+
 @app.get("/presigned-url")
 async def get_presigned_url(file_name: str):
     # try:
-        # 파일 이름에 타임스탬프 추가하여 유니크한 키 생성
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        unique_file_name = f"{timestamp}_{file_name}"
-        
-        # presigned URL 생성 (유효시간: 3600초 = 1시간)
-        presigned_url = s3_client.generate_presigned_url(
-            'put_object',
-            Params={
-                'Bucket': settings.AWS_BUCKET_NAME,
-                'Key': unique_file_name,
-                'ContentType': 'application/octet-stream'
-            },
-            ExpiresIn=3600
-        )
-        
-        return {
-            "presigned_url": presigned_url,
-            "file_key": unique_file_name
-        }
+    # 파일 이름에 타임스탬프 추가하여 유니크한 키 생성
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    unique_file_name = f"{timestamp}_{file_name}"
+
+    # presigned URL 생성 (유효시간: 3600초 = 1시간)
+    presigned_url = s3_client.generate_presigned_url(
+        'put_object',
+        Params={
+            'Bucket': settings.AWS_BUCKET_NAME,
+            'Key': unique_file_name,
+            'ContentType': 'application/octet-stream'
+        },
+        ExpiresIn=3600
+    )
+
+    return {
+        "presigned_url": presigned_url,
+        "file_key": unique_file_name
+    }
     # except Exception as e:
     #     # raise HTTPException(status_code=500, detail=str(e))
     #     println(e)

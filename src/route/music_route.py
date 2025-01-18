@@ -43,6 +43,7 @@ async def stream_music(music_id: str):
         filename=music_file.name
     )
 
+
 @router.get(
     "/streaming/{music_id}",
     description="음악 파일을 스트리밍합니다."
@@ -97,8 +98,71 @@ async def stream_music(music_id: str, range: str = Header(None)):
     )
 
 
-# 2. GET /by-period
+class Music(BaseModel):
+    musicId: int
+    musicTitle: str
+    date: str
+    friend: str
+    diary: str
+    feeling: int
+    keywords: List[str]
+    image: str
 
-# 3. GET /by-keyword
+
+# 2. GET /by-period
+"""
+response
+{
+music을 날짜에 맞게 묶어서 반환
+년-월 별로 묶어서 반환
+}
+"""
+
+
+class MusicByPeriod(BaseModel):
+    year: int
+    month: int
+    music: List[Music]
+
+
+@router.get(
+    "/by-period",
+    response_model=List[MusicByPeriod],
+    description="음악을 년-월 별로 묶어서 반환합니다."
+)
+async def get_music_by_period():
+    # mock 5개
+    return [
+        MusicByPeriod(year=2024, month=1, music=[Music(musicId=1, musicTitle="our dream", date="2024-01-01",
+                      friend="friend1", diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")]),
+        MusicByPeriod(year=2024, month=2, music=[Music(musicId=2, musicTitle="our dream", date="2024-02-01", friend="friend2", diary="diary2", feeling=2, keywords=["keyword1", "keyword2"], image="image2"),
+                                                 Music(musicId=3, musicTitle="our dream", date="2024-02-01", friend="friend3", diary="diary3", feeling=3, keywords=["keyword1", "keyword2"], image="image3")]),
+        MusicByPeriod(year=2024, month=3, music=[Music(musicId=3, musicTitle="our dream", date="2024-03-01",
+                      friend="friend3", diary="diary3", feeling=3, keywords=["keyword1", "keyword2"], image="image3")]),
+        MusicByPeriod(year=2024, month=4, music=[Music(musicId=4, musicTitle="our dream", date="2024-04-01",
+                      friend="friend4", diary="diary4", feeling=4, keywords=["keyword1", "keyword2"], image="image4")]),
+        MusicByPeriod(year=2024, month=5, music=[Music(musicId=5, musicTitle="our dream", date="2024-05-01",
+                      friend="friend5", diary="diary5", feeling=5, keywords=["keyword1", "keyword2"], image="image5")]),
+    ]
+
+# 3. GET /by-keyword/{keyword}
+@router.get(
+    "/by-keyword/{keyword}",
+    description="키워드에 맞는 음악을 반환합니다."
+)
+async def get_music_by_keyword(keyword: str):
+    return [
+        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1", diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
+    ]
+
+# 3. GET /by-friend/{friend}
+@router.get(
+    "/by-friend/{friend}",
+    description="친구에 맞는 음악을 반환합니다."
+)
+async def get_music_by_friend(friend: str):
+    return [
+        Music(musicId=1, musicTitle="our dream", date="2024-01-01", friend="friend1", diary="diary1", feeling=1, keywords=["keyword1", "keyword2"], image="image1")
+    ]
 
 # 3. GET /search
